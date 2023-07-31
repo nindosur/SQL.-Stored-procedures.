@@ -1,0 +1,205 @@
+ЗАДАНИЕ 1.
+--1
+
+CREATE PROCEDURE Hello
+AS 
+print('Hello, world!')
+GO
+exec Hello
+
+--2
+CREATE PROCEDURE TimeNow
+AS
+print(TIME())
+GO 
+exec TimeNow
+
+--3
+
+CREATE PROCEDURE DateNow
+AS
+print(DATE())
+GO 
+exec DateNow
+
+--4
+
+@a int,
+@b int,
+@c int
+as
+declare @res int
+set @res = @a + @b + @c
+return @res
+
+__________
+
+declare @summ int
+execute @summ = sp_summa @a = 5, @b = 25, @c = 10
+execute @summ = sp_summa 5, 25, 10
+select '5 + 25 + 10 =', @summ 
+
+--5
+@a int,
+@b int,
+@c int
+as
+declare @res int
+set @res = (@a + @b + @c) / 3
+return @res
+
+________________
+
+declare @summ int
+execute @summ = sr_arifm @a = 5, @b = 25, @c = 10
+execute @summ = sr_arifm 5, 25, 10
+select '(5 + 25 + 10) / 3 =', @summ
+
+--6
+
+CREATE PROCEDURE MaxValue
+@a int,
+@b int,
+@c int
+as
+declare @max int
+set @max = (select max(q) from (values(@a),(@b),(@c)) as numb(q))
+return @max
+_________________________
+declare @max int
+execute @max = MaxValue @a = 1, @b = 2, @c = 3
+execute @max = MaxValue 1, 2, 3
+select @max
+
+
+--7 MIN VALUE
+
+CREATE PROCEDURE MinValue
+@a int,
+@b int,
+@c int
+as
+declare @min int
+set @min = (select min(q) from (values(@a),(@b),(@c)) as numb(q))
+return @min
+___________
+declare @min int
+execute @min = MinValue @a = 1, @b = 2, @c = 3
+execute @min = MinValue 1, 2, 3
+select @min
+
+
+--8
+CREATE PROCEDURE StrUpd
+@a int,
+@b char(1)
+as
+begin
+	DECLARE @i int = 1
+	while (@i <= @a)
+	begin
+		print @b
+		set @i = @i + 1
+	end
+end
+_____________________
+exec StrUpd @a = 10, @b = #
+
+--9
+
+CREATE PROCEDURE getFactorial
+@num int
+as
+BEGIN
+  DECLARE @factorial int = 1
+  DECLARE @i int = 1
+
+  WHILE @i <= @num
+  BEGIN
+    SET @factorial = @factorial * @i
+    SET @i = @i + 1
+  END
+
+  SELECT @factorial AS 'Factorial'
+END
+________________________
+exec Factorial @num = 3
+
+
+--10
+
+CREATE PROCEDURE getPower
+  @num int,
+  @power int
+AS
+BEGIN
+  DECLARE @result float
+  SET @result = POWER(@num, @power)
+
+  SELECT @result AS 'Result'
+END
+____________________________________
+exec getPower @num = 2, @power = 3
+
+
+ЗАДАНИЕ 2.
+--1
+CREATE PROCEDURE showAllSellers
+AS
+BEGIN
+  SELECT * FROM Sellers
+END
+
+--2
+CREATE PROCEDURE showAllCustomers
+AS
+BEGIN
+  SELECT * FROM Customers
+END
+
+--3
+CREATE PROCEDURE showAllSales
+AS
+BEGIN
+  SELECT * FROM Sales
+END
+
+--4
+CREATE PROCEDURE showSalesByDate
+  @saleDate date
+AS
+BEGIN
+  SELECT * FROM Sales WHERE SaleDate = @saleDate
+END
+
+--5
+CREATE PROCEDURE showSalesByDateRange
+  @startDate date,
+  @endDate date
+AS
+BEGIN
+  SELECT * FROM Sales WHERE SaleDate BETWEEN @startDate AND @endDate
+END
+
+--6
+CREATE PROCEDURE showSalesBySeller
+  @sellerName varchar(100)
+AS
+BEGIN
+  SELECT s.*, c.CustomerName, p.ProductName, p.Price
+  FROM Sales s
+  JOIN Customers c ON s.CustomerID = c.CustomerID
+  JOIN Products p ON s.ProductID = p.ProductID
+  WHERE s.SellerID = (SELECT SellerID FROM Sellers WHERE SellerName = @sellerName)
+END
+
+--7
+CREATE PROCEDURE getAvgPriceByYear
+  @year int
+AS
+BEGIN
+  SELECT AVG(p.Price) AS 'Average Price'
+  FROM Sales s
+  JOIN Products p ON s.ProductID = p.ProductID
+  WHERE YEAR(s.SaleDate) = @year
+END
